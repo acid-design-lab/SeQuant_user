@@ -1,3 +1,5 @@
+import random
+
 from rdkit.Chem import rdMolDescriptors
 from rdkit import Chem
 import numpy as np
@@ -6,6 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
 from keras.models import Model
 import peptides
+from random import shuffle
 
 aa_dict = {'A': 'CC(C(=O)O)N', 'R': 'C(CC(C(=O)O)N)CN=C(N)N', 'N': 'C(C(C(=O)O)N)C(=O)N',
            'D': 'C(C(C(=O)O)N)C(=O)O', 'C': 'C(C(C(=O)O)N)S', 'Q': 'C(CC(=O)N)C(C(=O)O)N',
@@ -32,6 +35,29 @@ def generate_rdkit_descriptors(normalize: tuple = (-1, 1)):
     sc = MinMaxScaler(feature_range=normalize)
     scaled_array = sc.fit_transform(descriptors_set)
     return pd.DataFrame(scaled_array, columns=descriptor_names, index=list(aa_dict.keys()))
+
+
+def filter_sequences(sequences: [list, pd.DataFrame],
+                     max_length: int = 96,
+                     sequences_column_name: str = None,
+                     shuffle_seqs: bool = True):
+
+    if type(sequences) is list:
+        all_seqs = [seq.upper() for seq in sequences if len(seq) <= max_length]
+        all_seqs = list(dict.fromkeys(all_seqs))
+        filtered_seqs = [x for x in all_seqs if set(x).issubset(set(aa_dict.keys()))]
+        if shuffle_seqs:
+            filtered_seqs = random.sample(filtered_seqs, len(filtered_seqs))
+        return filtered_seqs
+
+    elif type(sequences) is pd.DataFrame:
+        sequences[sequences_column_name] = sequences[sequences_column_name].map(lambda x: x.replace(" ", ""))
+        sequences = sequences[sequences[sequences_column_name].apply(lambda x: len(x) <= max_length)]
+        peptide_subs = sequences.drop(sequences[sequences[sequences_column_name].str.contains(r'[@#&$%+-/*BXZ58 ]')]
+                                      .index)
+        if shuffle_seqs:
+            peptide_subs = peptide_subs.sample(frac=1)
+        return peptide_subs
 
 
 def seq_to_matrix_(sequence, descriptors, num):
