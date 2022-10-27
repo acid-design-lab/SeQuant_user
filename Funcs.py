@@ -8,6 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
 from keras.models import Model
 import peptides
+import os
 from random import shuffle
 
 aa_dict = {'A': 'CC(C(=O)O)N', 'R': 'C(CC(C(=O)O)N)CN=C(N)N', 'N': 'C(C(C(=O)O)N)C(=O)N',
@@ -41,7 +42,6 @@ def filter_sequences(sequences: [list, pd.DataFrame],
                      max_length: int = 96,
                      sequences_column_name: str = None,
                      shuffle_seqs: bool = True):
-
     if type(sequences) is list:
         all_seqs = [seq.upper() for seq in sequences if len(seq) <= max_length]
         all_seqs = list(dict.fromkeys(all_seqs))
@@ -61,7 +61,6 @@ def filter_sequences(sequences: [list, pd.DataFrame],
 
 
 def seq_to_matrix_(sequence, descriptors, num):
-
     rows = descriptors.shape[1]
     seq_matrix = tf.zeros(shape=[0, rows])  # shape (0,rows)
     for aa in sequence:
@@ -74,7 +73,7 @@ def seq_to_matrix_(sequence, descriptors, num):
     seq_matrix = tf.transpose(seq_matrix)
     shape = seq_matrix.get_shape().as_list()[1]
     if shape < num:
-        paddings = tf.constant([[0, 0], [0, num-shape]])
+        paddings = tf.constant([[0, 0], [0, num - shape]])
         add_matrix = tf.pad(seq_matrix,
                             paddings=paddings,
                             mode='CONSTANT',
@@ -86,11 +85,10 @@ def seq_to_matrix_(sequence, descriptors, num):
 
 
 def SeQuant_encoding(sequences_list, descriptors, num):
-
     container = []
     for i, sequence in enumerate(sequences_list):
         if i % 3200 == 0:
-            print(i*100/len(sequences_list), ' %')
+            print(i * 100 / len(sequences_list), ' %')
 
         seq_matrix = tf.expand_dims(seq_to_matrix_(sequence=sequence,
                                                    descriptors=descriptors,
@@ -106,8 +104,19 @@ def SeQuant_encoding(sequences_list, descriptors, num):
 
 def generate_latent_representations(sequences_list,
                                     sequant_encoded_sequences,
-                                    trained_model,
+                                    polymer_type='protein',
                                     add_peptide_descriptors=False):
+    dirname = os.getcwd()
+
+    if polymer_type == 'protein':
+        path = os.path.join(dirname, r'Models\proteins')
+    elif polymer_type == 'DNA' or polymer_type == 'RNA':
+        path = os.path.join(dirname, r'Models\nucleic_acids')
+    else:
+        print('Wrong polymer type')
+        return
+
+    trained_model = tf.keras.models.load_model(path)
 
     layer_name = 'Latent'
     intermediate_layer_model = Model(inputs=trained_model.input,
@@ -123,7 +132,6 @@ def generate_latent_representations(sequences_list,
 
 
 def add_peptide_generated_descriptors(sequences_list, encoded_sequences_to_add_to):
-
     seq_prop_set = pd.DataFrame([peptides.Peptide(seq).descriptors() for seq in sequences_list])
 
     descriptor_names = list(seq_prop_set.columns)
