@@ -29,4 +29,4 @@ X = generate_latent_representations(sequences_list=seq_list,
                                     sequant_encoded_sequences=encoded_sequences,
                                     polymer_type=polymer_type,
                                     add_peptide_descriptors=False,
-                                    path_to_model_folder=r'Models/nucleic_acids')
+                                    path_to_model_folder=r'app/utils/models/nucleic_acids')
