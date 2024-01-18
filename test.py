@@ -1,32 +1,16 @@
 import pandas as pd
+from app.sequant_tools import SequantTools
 
-from Funcs import (
-    generate_rdkit_descriptors,
-    SeQuant_encoding,
-    generate_latent_representations,
-    filter_sequences
-)
-
-
-max_peptide_length = 96
+max_peptide_length = 84
 polymer_type = 'DNA'
-seq_list = ['AT', 'GC']
+seq_list = ['Atgc', 'GC']
 seq_df = pd.DataFrame()
 
-filtered_sequences = filter_sequences(sequences=seq_list,
-                                      max_length=max_peptide_length,
-                                      sequences_column_name='sequence',
-                                      shuffle_seqs=True)
-
-descriptors_set = generate_rdkit_descriptors()
-
-encoded_sequences = SeQuant_encoding(sequences_list=filtered_sequences,
-                                     polymer_type=polymer_type,
-                                     descriptors=descriptors_set,
-                                     num=max_peptide_length)
-
-X = generate_latent_representations(sequences_list=seq_list,
-                                    sequant_encoded_sequences=encoded_sequences,
-                                    polymer_type=polymer_type,
-                                    add_peptide_descriptors=False,
-                                    path_to_model_folder=r'app/utils/models/nucleic_acids')
+sqt = SequantTools(
+    sequences=seq_list,
+    polymer_type=polymer_type,
+    max_sequence_length=max_peptide_length,
+    model_folder_path=r'app/utils/models/nucleic_acids'
+)
+X_ref = sqt.generate_latent_representations()
+print(X_ref)
