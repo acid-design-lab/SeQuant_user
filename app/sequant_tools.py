@@ -6,6 +6,7 @@ import numpy.typing as npt
 
 import peptides
 from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors
 
 import tensorflow as tf
 from keras.models import Model
@@ -68,7 +69,7 @@ class SequantTools:
             self
     ):
         """
-        Converts dict[monomer_name, smiles] (constants.monomers_smiles) into descriptors using rdkit.
+        Generates descriptors for monomers in dict[monomer_name, smiles] using rdkit.
         """
         descriptor_names: list[str] = list(Chem.rdMolDescriptors.Properties.GetAvailableProperties())
         num_descriptors: int = len(descriptor_names)
@@ -97,7 +98,7 @@ class SequantTools:
             shuffle: bool = True
     ) -> list[str]:
         """
-        Filters sequences based on the maximum length and content of known monomers
+        Filters sequences based on the maximum length and content of known monomers.
         :param shuffle: Set to True to shuffle list items.
         """
         all_sequences: list[str] = list({
@@ -175,8 +176,8 @@ class SequantTools:
             self
     ) -> tf.Tensor:
         """
-        Сonverts a list of sequences into a tensor.
-        :return: Sequences tensor.
+        Сonverts a list of sequences into a  sequences/descriptor tensor.
+        :return: Sequences/descriptor tensor.
         """
         container = []
         for i, sequence in tqdm(enumerate(self.filtered_sequences)):
@@ -195,7 +196,7 @@ class SequantTools:
             self
     ) -> np.ndarray:
         """
-        Processes the descriptor matrix using a model.
+        Processes the sequences/descriptor tensor using a model.
         :return: Ready-made features.
         """
         self.encoding()
