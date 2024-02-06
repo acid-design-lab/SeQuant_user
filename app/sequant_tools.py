@@ -28,7 +28,9 @@ class SequantTools:
         model_folder_path: str = '',
         normalize: bool = True,
         feature_range: tuple[int, int] = (-1, 1),
-        add_peptide_descriptors: bool = False
+        add_peptide_descriptors: bool = False,
+        new_monomers: list[dict] = [],
+        ignore_unknown_monomer: bool = False
     ):
         """
         Initialisation.
@@ -39,6 +41,8 @@ class SequantTools:
         :param normalize: Set to True to transform values with MinMaxScaler.
         :param feature_range: Desired range of transformed data.
         :param add_peptide_descriptors: Set to True to add peptide descriptors.
+        :param ignore_unknown_monomer: Set to True to ignore unknown monomers.
+        :param new_monomers: list of dicts with new monomers: {'name':'str', 'class':'protein/DNA/RNA', 'smiles':'str'}
         """
         self.descriptors: pd.DataFrame = pd.DataFrame()
         self.filtered_sequences: list[str] = []
@@ -56,8 +60,11 @@ class SequantTools:
         self.normalize = normalize
         self.feature_range = feature_range
         self.add_peptide_descriptors = add_peptide_descriptors
+        self.new_monomers = new_monomers
+        self.ignore_unknown_monomer = ignore_unknown_monomer
 
         self.monomer_smiles_info: dict[str, str] = monomer_smiles
+        self.add_monomers(self.new_monomers)
         self.scaler = MinMaxScaler(feature_range=self.feature_range)
 
         self.generate_rdkit_descriptors()
@@ -229,3 +236,29 @@ class SequantTools:
             self.peptide_descriptors = self.scaler.fit_transform(self.peptide_descriptors)
 
         return self.peptide_descriptors
+
+    def add_monomers(
+            self,
+            new_monomers: list[dict] = [],
+            ignore_unknown_monomer: bool = False
+    ):
+        """
+        Adds new monomers to the monomer_smiles_info: dict[str, str]
+        :param ignore_unknown_monomer: Set to True to ignore unknown monomers
+        :param new_monomers: list of dictionaries with data about new monomers:
+        {'name': 'str',
+        'class': 'protein/DNA/RNA',
+        'smiles': 'str'
+        }
+        """
+        if not ignore_unknown_monomer:
+            for item in new_monomers:
+                name = item['name']
+                prefix = ''
+                if item['class'] == 'RNA':
+                    prefix = 'r'
+                elif item['class'] == 'DNA':
+                    prefix = 'd'
+                name = prefix + name
+                if name not in self.monomer_smiles_info:
+                    self.monomer_smiles_info[name] = item['smiles']
