@@ -64,7 +64,7 @@ class SequantTools:
         self.ignore_unknown_monomer = ignore_unknown_monomer
 
         self.monomer_smiles_info: dict[str, str] = monomer_smiles
-        self.add_monomers(self.new_monomers)
+        self.add_monomers()
         self.scaler = MinMaxScaler(feature_range=self.feature_range)
 
         self.generate_rdkit_descriptors()
@@ -237,22 +237,12 @@ class SequantTools:
 
         return self.peptide_descriptors
 
-    def add_monomers(
-            self,
-            new_monomers: list[dict] = [],
-            ignore_unknown_monomer: bool = False
-    ):
+    def add_monomers(self):
         """
         Adds new monomers to the monomer_smiles_info: dict[str, str]
-        :param ignore_unknown_monomer: Set to True to ignore unknown monomers
-        :param new_monomers: list of dictionaries with data about new monomers:
-        {'name': 'str',
-        'class': 'protein/DNA/RNA',
-        'smiles': 'str'
-        }
         """
-        if not ignore_unknown_monomer:
-            for item in new_monomers:
+        if not self.ignore_unknown_monomer:
+            for item in self.new_monomers:
                 name = item['name']
                 prefix = ''
                 if item['class'] == 'RNA':
