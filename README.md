@@ -2,8 +2,9 @@
 Пакет для генерации дескрипторов с помощью rdkit и авторской нейронной сети
 
 ## сборка и запуск
-Установка pyenv и poetry - https://habr.com/ru/articles/599441/
-Документация poetry - https://python-poetry.org/docs/#installing-with-the-official-installer
+Установка pyenv и poetry - https://habr.com/ru/articles/599441/ .
+
+Документация poetry - https://python-poetry.org/docs/#installing-with-the-official-installer .
 
 Инциализация виртуальной среды
 ```bash
@@ -17,7 +18,7 @@ poetry install
 ## Class SequantTools
 
 
-## Метод класса generate_rdkit_descriptors
+## Метод класса **generate_rdkit_descriptors**
 
 Метод генерирует дескрипторы для мономеров, представленных в формате словаря {monomer_name: smiles}, используя библиотеку **RDKit**.
 <br>
@@ -44,7 +45,7 @@ poetry install
 
 <br>
 
-## Метод класса filter_sequences
+## Метод класса **filter_sequences**
 
 Метод фильтрует поданные при инициализации класса последовательности **self.sequences**, основываясь на максимальной длине последовательности **self.max_length** (дефолтное значение int = 96) и наличию мономеров последовательностей в словаре **self.monomer_smiles_info**.
 <br>
@@ -61,7 +62,7 @@ poetry install
 
 <br>
 
-## Метод класса define_prefix
+## Метод класса **define_prefix**
 
 Метод определяет префикс для мономеров последовательностей в зависимости от типа полимера, указанного в **self.polymer_type**.
 <br>
@@ -77,7 +78,7 @@ poetry install
 
 <br>
 
-## Метод класса model_import
+## Метод класса **model_import**
 
 Метод инициализирует предобученную модель автоэнкодера.
 <br>
@@ -91,7 +92,7 @@ poetry install
 
 <br>
 
-## Метод класса sequence_to_descriptor_matrix
+## Метод класса **sequence_to_descriptor_matrix**
 
 Метод преобразует одиночную последовательность в матрицу дескрипторов.
 <br>
@@ -113,7 +114,7 @@ poetry install
 
 <br>
 
-## Метод класса encoding
+## Метод класса **encoding**
 
 Преобразует список последовательностей в тензор дескрипторов.
 <br>
@@ -132,7 +133,7 @@ poetry install
 
 <br>
 
-## Метод класса generate_latent_representations
+## Метод класса **generate_latent_representations**
 
 Метод создает скрытые представления для каждой последовательности, которые можно использовать как готовые дескрипторы для применения в ML.
 <br>
@@ -149,7 +150,7 @@ poetry install
 
 <br>
 
-## Метод класса define_peptide_generated_descriptors
+## Метод класса **define_peptide_generated_descriptors**
 
 Создает дескрипторы пептидов, используя библиотеку Peptides.
 <br>
@@ -171,7 +172,7 @@ poetry install
 
 <br>
 
-## Метод класса add_monomers
+## Метод класса **add_monomers**
 
 Позволяет добавить новые мономеры в словарь стандартных мономеров.
 <br>
