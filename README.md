@@ -127,16 +127,14 @@ poetry install
 <br>
 * Входные данные:
   * self - экземпляр класса.
-<br>
+
 * Логика работы:
   * Применяется метод **encoding()**, с помощью которого создается список матриц дескрипторов каждой последовательности (для каждой последовательности своя матрица, где столбцы - названия мономеров, строки - имена дескрипторов);
   * С помощью метода **predict()** атрибута **self.model** (модель, созданная методом **model_import()** ) предсказываются скрытые представления (значения выходного слоя - “Latent”, модели);
   * Если параметр **self.add_peptide_descriptors** принимает значение True (дефолтное значение - False): к скрытым представлениям добавляются дескрипторы пептидов, сформированные методом define_peptide_generated_descriptors().
-<br>
+
 * Возвращаемое значение:
   * Скрытые представления - готовые к применению в ML фичи.
-
-<br>
 
 ### Метод класса define_peptide_generated_descriptors
 
@@ -144,7 +142,7 @@ poetry install
 <br>
 * Входные данные:
   * self - экземпляр класса.
-<br>
+
 * Логика работы:
   * Создается DataFrame peptide_descriptors;
   * Для каждой последовательности seq в self.filtered_sequences:
@@ -154,7 +152,7 @@ poetry install
   * DataFrame преобразуется в numpy array и сохраняется в self.peptide_descriptors;
   * Если параметр normalize равен True:
     - Дескрипторы нормализуются с использованием self.scaler.
-<br>
+
 * Возвращаемое значение:
    numpy array сгенерированных пептидных дескрипторов - self.peptide_descriptors.
 
@@ -164,12 +162,12 @@ poetry install
 <br>
 * Входные данные:
   * self - экземпляр класса;
-<br>
+
 * Необходимые данные при инициализации класса:
   * self.new_monomers: list[dict] = [] - список словарей с новыми мономерами в формате 
   {'name': 'str', 'class': 'protein/DNA/RNA', 'smiles': 'str'};
   * self.ignore_unknown_monomer: bool = False - флаг игнорирования неизвестных мономеров;
-<br>
+
 * Логика работы:
   * Если флаг ignore_unknown_monomer равен False:
     * Для каждого элемента item в списке self.new_monomers:
@@ -178,7 +176,7 @@ poetry install
       * Формируется имя с префиксом;
       * Если имя отсутствует в словаре self.monomer_smiles_info:
         * Добавляется запись в словарь: self.monomer_smiles_info[name] = item['smiles'].
-<br>
+
 
 ### Пример использования метода **generate_latent_representations()**.
 
