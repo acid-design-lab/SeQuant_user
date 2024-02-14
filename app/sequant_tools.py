@@ -118,7 +118,7 @@ class SequantTools:
             raise ValueError(
                 """
                 There are unknown monomers in sequences. Please add them in with using new_monomers parameter
-                or set ignore_unknown_monomer as False.
+                or set ignore_unknown_monomer as True.
                 """
             )
 
