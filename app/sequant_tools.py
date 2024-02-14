@@ -48,7 +48,7 @@ class SequantTools:
         self.filtered_sequences: list[str] = []
         self.prefix: str = ''
         self.encoded_sequences: tf.Tensor = []
-        self.model: Model = None #intermediate_layer_model
+        self.model: Model = None    # intermediate_layer_model
         self.peptide_descriptor_names: list[str] = []
         self.peptide_descriptors: npt.NDArray = []
         self.latent_representation: npt.NDArray = []
@@ -103,7 +103,7 @@ class SequantTools:
     def filter_sequences(
             self,
             shuffle: bool = True
-    ) -> list[str]:
+    ):
         """
         Filters sequences based on the maximum length and content of known monomers.
         :param shuffle: Set to True to shuffle list items.
@@ -114,6 +114,14 @@ class SequantTools:
         self.filtered_sequences = [
             sequence for sequence in all_sequences if set(sequence).issubset(set(self.monomer_smiles_info.keys()))
         ]
+        if not self.ignore_unknown_monomer and len(all_sequences) != len(self.filtered_sequences):
+            raise ValueError(
+                """
+                There are unknown monomers in sequences. Please add them in with using new_monomers parameter
+                or set ignore_unknown_monomer as True.
+                """
+            )
+
         if shuffle:
             self.filtered_sequences: list[str] = random.sample(
                 self.filtered_sequences,
