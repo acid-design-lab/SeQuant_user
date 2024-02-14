@@ -38,8 +38,7 @@ poetry install
   
   * Если параметр self.normalize равен True (дефолтное значение True), то дескрипторы нормализуются с использованием self.scaler.fit_transform(descriptors_set).
     - Используется **MinMaxScaler** из пакета sklearn 
-(self.scaler = MinMaxScaler(feature_range=self.feature_range), feature_range: tuple[int, int] = (-1;1))
- к слову мы можем внести вариабельность в этом месте, но это потом однажды;
+(self.scaler = MinMaxScaler(feature_range=self.feature_range), feature_range: tuple[int, int] = (-1;1));
 
   * Полученные результаты сохраняются в виде DataFrame self.descriptors с колонками descriptor_names и индексами из ключей словаря **self.monomer_smiles_info**.
 
