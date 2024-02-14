@@ -21,13 +21,15 @@ poetry install
 Метод генерирует дескрипторы для мономеров, представленных в формате словаря {monomer_name: smiles}, используя библиотеку **RDKit**.
 <br>
 * Входные данные:
-<br>
   * self - экземпляр класса.
 <br>
+
 * Логика работы:
-<br>
+  
   * Сначала определяется список имен доступных дескрипторов с помощью **Chem.rdMolDescriptors.Properties.GetAvailableProperties()**;
+    
   * Далее создается пустой массив descriptors_set размером (0, num_descriptors), где num_descriptors - количество дескрипторов;
+    
   * Затем для каждого значения в словаре **self.monomer_smiles_info**:
     - Создается “молекула" из SMILES-строки с помощью **Chem.MolFromSmiles()**;
     - Рассчитываются дескрипторы для данной молекулы с помощью **get_descriptors.ComputeProperties()**;
