@@ -6,6 +6,7 @@ import numpy.typing as npt
 
 import peptides
 from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors
 
 import tensorflow as tf
 from keras.models import Model
@@ -27,7 +28,9 @@ class SequantTools:
         model_folder_path: str = '',
         normalize: bool = True,
         feature_range: tuple[int, int] = (-1, 1),
-        add_peptide_descriptors: bool = False
+        add_peptide_descriptors: bool = False,
+        new_monomers: list[dict] = [],
+        ignore_unknown_monomer: bool = False
     ):
         """
         Initialisation.
@@ -38,12 +41,14 @@ class SequantTools:
         :param normalize: Set to True to transform values with MinMaxScaler.
         :param feature_range: Desired range of transformed data.
         :param add_peptide_descriptors: Set to True to add peptide descriptors.
+        :param ignore_unknown_monomer: Set to True to ignore unknown monomers.
+        :param new_monomers: list of dicts with new monomers: {'name':'str', 'class':'protein/DNA/RNA', 'smiles':'str'}
         """
         self.descriptors: pd.DataFrame = pd.DataFrame()
         self.filtered_sequences: list[str] = []
         self.prefix: str = ''
         self.encoded_sequences: tf.Tensor = []
-        self.model: Model = None #intermediate_layer_model
+        self.model: Model = None    # intermediate_layer_model
         self.peptide_descriptor_names: list[str] = []
         self.peptide_descriptors: npt.NDArray = []
         self.latent_representation: npt.NDArray = []
@@ -55,8 +60,11 @@ class SequantTools:
         self.normalize = normalize
         self.feature_range = feature_range
         self.add_peptide_descriptors = add_peptide_descriptors
+        self.new_monomers = new_monomers
+        self.ignore_unknown_monomer = ignore_unknown_monomer
 
         self.monomer_smiles_info: dict[str, str] = monomer_smiles
+        self.add_monomers()
         self.scaler = MinMaxScaler(feature_range=self.feature_range)
 
         self.generate_rdkit_descriptors()
@@ -68,7 +76,7 @@ class SequantTools:
             self
     ):
         """
-        Converts dict[monomer_name, smiles] (constants.monomers_smiles) into descriptors using rdkit.
+        Generates descriptors for monomers in dict[monomer_name, smiles] using rdkit.
         """
         descriptor_names: list[str] = list(Chem.rdMolDescriptors.Properties.GetAvailableProperties())
         num_descriptors: int = len(descriptor_names)
@@ -95,9 +103,9 @@ class SequantTools:
     def filter_sequences(
             self,
             shuffle: bool = True
-    ) -> list[str]:
+    ):
         """
-        Filters sequences based on the maximum length and content of known monomers
+        Filters sequences based on the maximum length and content of known monomers.
         :param shuffle: Set to True to shuffle list items.
         """
         all_sequences: list[str] = list({
@@ -106,6 +114,14 @@ class SequantTools:
         self.filtered_sequences = [
             sequence for sequence in all_sequences if set(sequence).issubset(set(self.monomer_smiles_info.keys()))
         ]
+        if not self.ignore_unknown_monomer and len(all_sequences) != len(self.filtered_sequences):
+            raise ValueError(
+                """
+                There are unknown monomers in sequences. Please add them in with using new_monomers parameter
+                or set ignore_unknown_monomer as False.
+                """
+            )
+
         if shuffle:
             self.filtered_sequences: list[str] = random.sample(
                 self.filtered_sequences,
@@ -175,8 +191,8 @@ class SequantTools:
             self
     ) -> tf.Tensor:
         """
-        Сonverts a list of sequences into a tensor.
-        :return: Sequences tensor.
+        Сonverts a list of sequences into a  sequences/descriptor tensor.
+        :return: Sequences/descriptor tensor.
         """
         container = []
         for i, sequence in tqdm(enumerate(self.filtered_sequences)):
@@ -195,7 +211,7 @@ class SequantTools:
             self
     ) -> np.ndarray:
         """
-        Processes the descriptor matrix using a model.
+        Processes the sequences/descriptor tensor using a model.
         :return: Ready-made features.
         """
         self.encoding()
@@ -228,3 +244,19 @@ class SequantTools:
             self.peptide_descriptors = self.scaler.fit_transform(self.peptide_descriptors)
 
         return self.peptide_descriptors
+
+    def add_monomers(self):
+        """
+        Adds new monomers to the monomer_smiles_info: dict[str, str]
+        """
+        if not self.ignore_unknown_monomer:
+            for item in self.new_monomers:
+                name = item['name']
+                prefix = ''
+                if item['class'] == 'RNA':
+                    prefix = 'r'
+                elif item['class'] == 'DNA':
+                    prefix = 'd'
+                name = prefix + name
+                if name not in self.monomer_smiles_info:
+                    self.monomer_smiles_info[name] = item['smiles']
