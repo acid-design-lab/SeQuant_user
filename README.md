@@ -14,8 +14,6 @@ poetry install
 ```
 
 # Документация
-Документация SeQuant
-
 
 ## Class SequantTools
 
