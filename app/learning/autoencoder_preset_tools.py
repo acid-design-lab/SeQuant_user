@@ -6,26 +6,29 @@ from sklearn.preprocessing import MinMaxScaler
 from tqdm import tqdm
 
 
-def make_monomer_descriptors(aa_dict):
+def make_monomer_descriptors(monomer_dict: dict[str, str]) -> pd.DataFrame:
     descriptor_names = list(rdMolDescriptors.Properties.GetAvailableProperties())
     get_descriptors = rdMolDescriptors.Properties(descriptor_names)
     num_descriptors = len(descriptor_names)
 
     descriptors_set = np.empty((0, num_descriptors), float)
 
-    for _, value in aa_dict.items():
+    for _, value in monomer_dict.items():
         molecule = Chem.MolFromSmiles(value)
         descriptors = np.array(get_descriptors.ComputeProperties(molecule)).reshape((-1,num_descriptors))
         descriptors_set = np.append(descriptors_set, descriptors, axis=0)
 
     sc = MinMaxScaler(feature_range=(-1, 1))
     scaled_array = sc.fit_transform(descriptors_set)
-    descriptors_set = pd.DataFrame(scaled_array, columns=descriptor_names, index=aa_dict.keys())
+    descriptors_set = pd.DataFrame(scaled_array, columns=descriptor_names, index=monomer_dict.keys())
     return descriptors_set
 
 
-def seq_to_matrix(sequence, descriptors, num):
-
+def seq_to_matrix(
+    sequence: str,
+    descriptors: pd.DataFrame,
+    num: int
+):
     rows = descriptors.shape[1]
     seq_matrix = np.empty((0, rows), float)  # shape (0,rows)
     for aa in sequence:
@@ -47,7 +50,11 @@ def seq_to_matrix(sequence, descriptors, num):
     return seq_matrix
 
 
-def encode_seqs(sequences_list, descriptors, num):
+def encode_seqs(
+    sequences_list: list[str],
+    descriptors: dict[str, str],
+    num: int
+):
     lst = []
     i = 0
     for sequence in tqdm(sequences_list):
