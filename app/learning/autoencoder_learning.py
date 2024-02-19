@@ -44,7 +44,6 @@ tf.keras.backend.clear_session()
 tf.random.set_seed(2022)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-
 # Processing labeled data (AMPs database)
 labeled_data = pd.read_csv('/content/drive/MyDrive/SeQuant/AMPs/AMP_ADAM2.txt', on_bad_lines='skip')
 labeled_data = labeled_data.replace('+', 1)
@@ -107,13 +106,15 @@ all_seqs = labeled_data_seqs + unlabeled_data + unlabeled_data_2 + unlabeled_dat
 all_seqs = [seq for seq in all_seqs if len(seq) <= max_len]
 all_seqs = list(dict.fromkeys(all_seqs))
 all_seqs = [string.upper() for string in all_seqs]
-all_seqs_full = [x for x in all_seqs if "B" not in x
-                 and "X" not in x
-                 and "Z" not in x
-                 and "5" not in x
-                 and "8" not in x
-                 and "-" not in x
-                 and " " not in x]
+all_seqs_full = [
+    x for x in all_seqs if "B" not in x
+    and "X" not in x
+    and "Z" not in x
+    and "5" not in x
+    and "8" not in x
+    and "-" not in x
+    and " " not in x
+]
 
 indices = len(all_seqs_full)
 indices = list(range(indices))
@@ -188,7 +189,6 @@ with open('/content/drive/MyDrive/SeQuant/trainHistoryDict' + str(num_seq) + '_m
 with open('/content/drive/MyDrive/SeQuant/trainHistoryDict' + str(num_seq) + '_maxlen' + str(max_len) + '_' + str(
         pad) + 'pad_alldescs_norm-1to1_batch' + str(batch_size) + '_lr' + str(learning_rate), 'rb') as f:
     learning_history = pickle.load(f)
-
 
 loss_hist = learning_history['loss']
 val_loss_hist = learning_history['val_loss']

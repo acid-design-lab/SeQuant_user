@@ -32,7 +32,7 @@ def seq_to_matrix(
     rows = descriptors.shape[1]
     seq_matrix = np.empty((0, rows), float)  # shape (0,rows)
     for aa in sequence:
-        descriptors_array = np.array(descriptors.loc[aa]).reshape((1,rows))  # shape (1,rows)
+        descriptors_array = np.array(descriptors.loc[aa]).reshape((1, rows))  # shape (1,rows)
         seq_matrix = np.append(seq_matrix, descriptors_array, axis=0)
     seq_matrix = seq_matrix.T
     shape = seq_matrix.shape[1]
