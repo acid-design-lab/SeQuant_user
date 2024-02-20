@@ -7,7 +7,7 @@ from lazypredict.Supervised import LazyClassifier
 
 class NovaPredictTools:
 
-    def Lazyregressor_vae(features, target, 
+    def Lazyregressor_vae(self, features, target,
                       size_of_test=0.2,
                       scaler = MinMaxScaler(),
                       random_st = 0
@@ -25,7 +25,7 @@ class NovaPredictTools:
 
 
 
-    def LazyClass_vae(features, target, 
+    def LazyClass_vae(self, features, target,
                       size_of_test=0.2,
                       scaler = MinMaxScaler(),
                       use_scaler = True,
