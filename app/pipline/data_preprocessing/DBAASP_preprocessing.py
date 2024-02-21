@@ -1,19 +1,19 @@
 import pandas as pd
-from app.sequant_tools import SequantTools
+import peptides
 
-peptides_1 = pd.read_csv('../../utils/data/peptides.csv')
-peptides_2 = pd.read_csv('../../utils/data/peptides_2.csv')
+peptide_1 = pd.read_csv('../../utils/data/peptides.csv')
+peptide_2 = pd.read_csv('../../utils/data/peptides_2.csv')
 
 # Uniting DataFrame
-peptides = pd.concat([peptides_1, peptides_2], axis=0)
-peptides.reset_index(drop=True, inplace=True)
+peptide = pd.concat([peptide_1, peptide_2], axis=0)
+peptide.reset_index(drop=True, inplace=True)
 
 # Keeping only required columns
 needed_columns = ['SEQUENCE', 'TARGET ACTIVITY - TARGET SPECIES',
                   'TARGET ACTIVITY - ACTIVITY MEASURE VALUE',
                   'TARGET ACTIVITY - ACTIVITY (μg/ml) (Calculated By DBAASP)']
 
-peptides_cleaned = peptides.loc[:, needed_columns]
+peptides_cleaned = peptide.loc[:, needed_columns]
 DBAASP_initial = peptides_cleaned.dropna(how='any')
 DBAASP_initial.reset_index(drop=True, inplace=True)
 
@@ -31,23 +31,13 @@ filtered_DBAASP.reset_index(drop=True, inplace=True)
 
 # Getting descriptors from the peptides package
 DBAASP_sequences = filtered_DBAASP["SEQ"]
-polymer_type = 'protein'
-max_peptide_length = 96
 
-sqt = SequantTools(
-    sequences=DBAASP_sequences,
-    polymer_type=polymer_type,
-    max_sequence_length=max_peptide_length,
-    model_folder_path=r'../../utils/models/proteins',
-    add_peptide_descriptors=True
+DBAASP_peptide_descriptors = pd.DataFrame(
+            [peptides.Peptide(seq).descriptors() for seq in DBAASP_sequences]
 )
 
-DBAASP_peptide_descriptors = sqt.define_peptide_generated_descriptors()
-
-DBAASP_peptide_descriptors = pd.DataFrame(DBAASP_peptide_descriptors)
-
 # Getting required descriptors
-needed_descriptors = [32, 33, 34]
+needed_descriptors = ["E1", "E2", "E3"]
 DBAASP_peptide_descriptors_cleaned = DBAASP_peptide_descriptors.loc[:, needed_descriptors]
 
 DBAASP_peptide_descriptors_cleaned.columns = ['Hydrophobicity', 'Size', 'Helical_propensity']
@@ -57,3 +47,4 @@ DBAASP_peptide_descriptors_cleaned.columns = ['Hydrophobicity', 'Size', 'Helical
 DBAASP = pd.concat([filtered_DBAASP, DBAASP_peptide_descriptors_cleaned], axis=1)
 
 DBAASP.to_csv('../../utils/data/DBAASP.csv', index=False)
+
