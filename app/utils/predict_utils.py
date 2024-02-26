@@ -17,9 +17,13 @@ class NovaPredictTools:
         scaler.fit(X_train)
         x_train = scaler.transform(X_train)
         x_test = scaler.transform(X_test)
+        scaler2 = MinMaxScaler()
+        scaler2.fit(Y_train)
+        y_train = scaler2.transform(Y_train)
+        y_test = scaler2.transform(Y_test)
 
         clf = LazyRegressor(verbose=0, ignore_warnings=True, custom_metric=None)
-        train, test = clf.fit(x_train, x_test, Y_train, Y_test)
+        train, test = clf.fit(x_train, x_test, y_train, y_test)
         test_mod = test.iloc[:-1, :]
         return test_mod
 

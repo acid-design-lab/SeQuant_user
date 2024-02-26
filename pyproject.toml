@@ -18,6 +18,7 @@ rdkit-pypi = "^2022.9.5"
 peptides = "^0.3.2"
 tqdm = "^4.66.1"
 lazypredict = "^0.2.12"
+seaborn = "^0.13.2"
 
 [build-system]
 requires = ["poetry-core"]

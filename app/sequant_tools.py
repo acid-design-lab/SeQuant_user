@@ -101,8 +101,7 @@ class SequantTools:
         )
 
     def filter_sequences(
-            self,
-            shuffle: bool = True
+            self
     ):
         """
         Filters sequences based on the maximum length and content of known monomers.
@@ -122,11 +121,6 @@ class SequantTools:
                 """
             )
 
-        if shuffle:
-            self.filtered_sequences: list[str] = random.sample(
-                self.filtered_sequences,
-                len(self.filtered_sequences)
-            )
 
     def define_prefix(self):
         """
